@@ -90,7 +90,7 @@ Retry with backoff on 408, 429, 500, 502, 503, 504, 520, 522, 524. Otherwise fix
 - 422: bad values (size, aspect ratio, frame rate, inaccessible image URL)
 - 429: RPM exceeded (default tier is roughly 20 RPM text, 1 RPM video)
 
-The JSON error body format is not documented.
+Error bodies observed in testing look like `{"code": "insufficient_user_quota", "message": "...", "data": null}`. Video create returned HTTP 403 with `insufficient_user_quota` when the account balance was $0, so a 403 can also mean no credit, not only a policy block.
 
 ## Not yet documented
 
