@@ -40,14 +40,33 @@ Output is a URL or Base64. Editing inputs go in `extra_body.image` (shape not do
 
 ## Video generation (asynchronous)
 
+Create a task with `POST /v1/videos`, then poll with the returned `video_id`. `id` and `task_id` identify the task, but `video_id` is what retrieval uses.
+
 ```bash
-curl -X POST https://apihub.agnes-ai.com/v1/videos \
+curl -sS -X POST https://apihub.agnes-ai.com/v1/videos \
   -H "Authorization: Bearer $AGNES_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model": "agnes-video-v2.0", "prompt": "A cat walking on a beach at sunset", "height": 768, "width": 1152, "num_frames": 121, "frame_rate": 24}'
+  -d '{"model": "agnes-video-2.5", "prompt": "A futuristic city street after rain, neon reflections, a silver car passing slowly", "seconds": "5", "mode": "text", "size": "720P", "aspect_ratio": "16:9"}'
+
+curl -sS "https://apihub.agnes-ai.com/agnesapi?video_id=VIDEO_ID&model_name=agnes-video-2.5" \
+  -H "Authorization: Bearer $AGNES_API_KEY"
 ```
 
-Poll the result with the returned `video_id`: `GET https://apihub.agnes-ai.com/agnesapi?video_id=<VIDEO_ID>`. Do not use `task_id` unless a legacy workflow requires it. The create-response shape and status values are not documented.
+Always use the query form with `model_name`, for every mode. Poll every 1 to 2 seconds until `status` is `completed` or `failed`, then use `url`.
+
+`agnes-video-2.5` parameters:
+
+- `model` (required), `prompt` (required), `mode` (required): `text`, `keyframe`, or `reference`
+- `seconds`: string, `"4"` to `"12"`, default `"5"`
+- `size`: `"720P"`, `"1080P"`, `"1K"`, `"2K"`
+- `aspect_ratio`: default `16:9`
+- `seed`: integer. `n`: only `1` is supported.
+- keyframe mode: `first_frame` and/or `last_frame` (image URLs)
+- reference mode: `images` (URLs), `audios` (URLs), `videos` (objects); refer to them in the prompt as `<Picture N>`, `<Audio N>`, `<Video N>`
+
+Pricing for `agnes-video-2.5`: 720P $0.025/s, 1080P and 1K $0.040/s, 2K $0.055/s. Tell the user the cost before running a long or high-resolution generation.
+
+The older `agnes-video-v2.0` documents `height`, `width`, `num_frames`, and `frame_rate` instead of `size` and `seconds`. Do not mix the two parameter sets.
 
 ## Models
 
@@ -75,4 +94,4 @@ The JSON error body format is not documented.
 
 ## Not yet documented
 
-Full image and video request/response schemas, video status values, and `MODEL_CATALOG.md`. Official docs: https://agnes-ai.com/doc/overview. Do not guess these; check the docs or ask the user.
+The video `videos` object fields, aspect ratios other than 16:9, image edit input shape, and `MODEL_CATALOG.md`. Official docs: https://agnes-ai.com/doc/overview. Do not guess these; check the docs or ask the user.
