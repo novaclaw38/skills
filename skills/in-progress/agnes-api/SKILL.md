@@ -80,7 +80,9 @@ A wrong model name can surface as 404 or 503.
 
 ## Errors
 
-Retry with backoff on 408, 429, 500, 502, 503, 504, 520, 522, 524. Otherwise fix the request:
+Retry with backoff on 408, 429, 500, 502, 503, 504, 520, 522, 524. Otherwise fix the request. `503 video_queue_full` is a capacity error on video create (seen repeatedly on `agnes-video-2.5-flash`); retry later with a long delay, not in a tight loop.
+
+Fix the request for:
 
 - 401: missing, bad, or expired key
 - 402: balance or Token Plan quota exhausted
