@@ -1,0 +1,3 @@
+interface:
+  display_name: "Agnes API"
+  short_description: "Call the Agnes AI API"
